@@ -49,11 +49,9 @@ export class Lever implements Platform {
             throw Error("Do not have `category` before processing a posting.");
 
           const id = child.getAttribute("data-qa-posting-id");
-          const anchor = child.querySelector("a");
-          console.log({ anchor})
-          
+          const title = child?.querySelector("h5")?.textContent;
+          const anchor = child.querySelector("a");          
           const link = anchor?.getAttribute("href")
-          const title = anchor?.querySelector("h5")?.textContent;
           const attributes = [...anchor?.getElementsByClassName(LeverClassNames.POSTING_CATEGORIES) ?? []]
             .reduce<string[]>((accumulator, { textContent }) => {
               if (textContent) accumulator.push(textContent)
@@ -61,7 +59,7 @@ export class Lever implements Platform {
             }, [])
           
           if (!id) {
-            throw Error("The `href` attribute of the anchor in a posting was not valid.")
+            throw Error("The `id` attribute of the anchor in a posting was not valid.")
           }
 
           if (!link) {
@@ -69,7 +67,7 @@ export class Lever implements Platform {
           }
 
           if (!title) {
-            throw Error("The `href` attribute of the anchor in a posting was not valid.")
+            throw Error("The `title` attribute of the anchor in a posting was not valid.")
           }
 
           listings.push({
@@ -84,6 +82,6 @@ export class Lever implements Platform {
       }
     }
       
-    return []
+    return listings;
   }
 }
