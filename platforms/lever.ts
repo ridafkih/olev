@@ -52,7 +52,7 @@ export class Lever implements Platform {
           const title = child?.querySelector("h5")?.textContent;
           const anchor = child.querySelector("a");          
           const link = anchor?.getAttribute("href")
-          const attributes = [...anchor?.getElementsByClassName(LeverClassNames.POSTING_CATEGORIES) ?? []]
+          const attributes = [...child?.querySelectorAll(`.${LeverClassNames.POSTING_CATEGORIES} span[href]`) ?? []]
             .reduce<string[]>((accumulator, { textContent }) => {
               if (textContent) accumulator.push(textContent)
               return accumulator;
