@@ -1,6 +1,13 @@
 # olev
 
-To install dependencies:
+## Recruiter Platform Scraping Tool
+
+This is a tool that allows you to scrape data from recruitment platforms.
+
+### Supported Platforms
+
+- [x] Lever
+- [ ] Ashby
 
 ```bash
 bun install
@@ -9,7 +16,5 @@ bun install
 To run:
 
 ```bash
-bun run index.ts
+bun lever https://jobs.lever.co/company-lever-link
 ```
-
-This project was created using `bun init` in bun v1.2.10. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.

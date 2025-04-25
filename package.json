@@ -1,8 +1,10 @@
 {
   "name": "olev",
-  "module": "index.ts",
   "type": "module",
   "private": true,
+  "scripts": {
+    "lever": "bun run lever.ts"
+  },
   "devDependencies": {
     "@types/bun": "latest",
     "@types/jsdom": "^21.1.7"

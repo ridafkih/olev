@@ -8,6 +8,8 @@ if (!isUrlValid(url)) {
   throw Error(`An invalid URL '${url}' was passed.`)  
 }
 
+const hash = xxhash().create32()
+
 const lever = new Lever(url)
 const listings = await lever.getListings();
 
