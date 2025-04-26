@@ -16,6 +16,7 @@
     "@ridafkih/xxhash-wasm": "^2.0.3",
     "arktype": "^2.1.20",
     "jsdom": "^26.1.0",
+    "logsnag": "^1.0.0",
     "redis": "^4.7.0"
   }
 }

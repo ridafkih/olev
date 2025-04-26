@@ -2,7 +2,11 @@
 
 ## Prerequisites
 
-In order to compare the hash of the current job postings with that which is stored in the Redis store, you need to instantiate a Redis store, then set the `REDIS_URL` environment variable to the url which points to the Redis store. If you're part of the Vercel organization which is linked to a Redis storage, you can run the following command.
+In order to compare the hash of the current job postings with that which is stored in the Redis store, you need to instantiate a Redis store, then set the `REDIS_URL` environment variable to the url which points to the Redis store.
+
+You must also have a LogSnag project configured, and set the `LOGSNAG_PROJECT_NAME` environment variable to the project name, and `LOGSNAG_API_KEY` to an API key attached to the project.
+
+If you're part of the Vercel organization which has the environment variables configured, run the following command.
 
 ```bash
 vercel env pull .env.development.local
