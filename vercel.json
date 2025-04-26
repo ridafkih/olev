@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "crons": [
+    {
+      "path": "/cron/lever?url=https://jobs.lever.co/wealthsimple",
+      "schedule": "*/15 * * * *"
+    },
+    {
+      "path": "/cron/lever?url=https://jobs.lever.co/stackadapt",
+      "schedule": "*/15 * * * *"
+    }
+  ]
+}
