@@ -1,7 +1,7 @@
 import LogSnag from "logsnag"
 import { NextResponse } from "next/server"
 import xxhash from "@ridafkih/xxhash-wasm";
-import redis from "redis"
+import { createClient } from "redis"
 import { isUrlValid } from "../../../utils/url";
 import { Lever } from "../../../platforms/lever";
 
@@ -23,7 +23,7 @@ if (!isUrlValid(REDIS_URL)) {
 
 export async function GET(request: Request) {
   const url = new URL(request.url).searchParams.get("url")
-  const store = await redis.createClient({ url: REDIS_URL }).connect()
+  const store = await createClient({ url: REDIS_URL }).connect()
 
   try {
     if (!url) {
