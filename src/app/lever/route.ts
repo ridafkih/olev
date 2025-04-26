@@ -24,11 +24,6 @@ const urlWhitelist = new UrlWhitelist(WHITELIST_URLS);
 const redisHashStore = new RedisJobBoardHashStore(REDIS_URL)
 const rateLimiter = new RedisRateLimiter(REDIS_URL);
 
-await Promise.all([
-  redisHashStore.start(),
-  rateLimiter.start()
-]);
-
 export async function GET(request: Request) {
   const url = new URL(request.url).searchParams.get("url")
   const { hostname, pathname } = url !== null ? new URL(url) : {}
@@ -36,6 +31,11 @@ export async function GET(request: Request) {
   if (!url || !hostname || !pathname) {
     throw Error(`Invalid URL has been passed into the 'url' query parameter.`)
   }
+
+  await Promise.all([
+    redisHashStore.start(),
+    rateLimiter.start()
+  ]);
 
   if (!urlWhitelist.isAllowed(url)) {
     return new NextResponse(null, { status: 403 });
