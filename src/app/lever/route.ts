@@ -1,4 +1,3 @@
-import LogSnag from "logsnag"
 import { NextResponse } from "next/server"
 import { type } from "arktype";
 import { LeverPlatform } from "../../platforms/LeverPlatform";

@@ -9,6 +9,10 @@ enum LeverClassNames {
   POSTING_CATEGORIES = 'posting-categories'
 }
 
+/**
+ * Should abstract functionality for extracting linear list of elements
+ * to then derive a "job board" structure from. Good composition use case.
+ */
 export class LeverPlatform implements JobBoardPlatform {
   constructor(private readonly url: string) {}
   
