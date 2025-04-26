@@ -23,8 +23,7 @@ if (!LOGSNAG_PROJECT_NAME || !LOGSNAG_API_KEY) {
 const hash = xxhash().create32()
 
 const lever = new Lever(url)
-// const listings = await lever.getListings();
-const listings: JobListing[] = [];
+const listings = await lever.getListings();
 
 for (const listing of listings) {
   const { id, title } = listing;
