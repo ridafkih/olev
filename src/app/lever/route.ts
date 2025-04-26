@@ -38,7 +38,7 @@ export async function GET(request: Request) {
 
     const matches = await redisHashStore.checkKey(url, hash);
 
-    if (matches) {
+    if (!matches) {
       await Promise.all([
         redisHashStore.setKey(url, hash),
         notificationService.notifyChangeDetected(url, hash),
