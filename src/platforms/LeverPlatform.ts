@@ -1,5 +1,5 @@
 import { JSDOM } from "jsdom"
-import type { JobListing, Platform } from "../types/Platform";
+import type { JobListing, JobBoardPlatform } from "../types/Platform";
 
 enum LeverClassNames {
   POSTINGS_GROUP = 'postings-group',
@@ -9,7 +9,7 @@ enum LeverClassNames {
   POSTING_CATEGORIES = 'posting-categories'
 }
 
-export class Lever implements Platform {
+export class LeverPlatform implements JobBoardPlatform {
   constructor(private readonly url: string) {}
   
   public async getDocument(): Promise<Document> {

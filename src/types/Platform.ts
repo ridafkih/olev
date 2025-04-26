@@ -7,7 +7,7 @@ export interface JobListing {
   link: string;
 }
 
-export interface Platform {
+export interface JobBoardPlatform {
   getListings(): Promise<JobListing[]>;
   getDocument(): Promise<Document>;
 }
