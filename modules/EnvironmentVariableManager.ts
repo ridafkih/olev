@@ -10,7 +10,9 @@ export class EnvironmentVariableManager<ArkTypeValidationType extends Type> {
     this.validatedProcessEnv = assert(processEnv);
   }
 
-  public getValue(key: keyof ArkTypeValidationType["infer"]) {
+  public getValue<
+    Key extends keyof ArkTypeValidationType["infer"]
+  >(key: Key): ArkTypeValidationType["infer"][Key] {
     return this.validatedProcessEnv[key];
   }
 }
