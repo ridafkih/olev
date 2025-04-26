@@ -2,8 +2,6 @@
 
 Olev is a job board monitoring service that uses Vercel Cron to check for changes on your top-pick company's job boards and sends notifications directly to your mobile device using [LogSnag](https://logsnag.com/) when changes to the listings are detected.
 
-<img src="https://github.com/user-attachments/assets/2f9158fc-0812-44b5-91fb-62b0d116bf39" width="420" />
-
 ## Supported Platforms
 
 - [ ] Ashby
