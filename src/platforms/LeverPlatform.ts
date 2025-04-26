@@ -1,5 +1,5 @@
 import { JSDOM } from "jsdom"
-import type { JobListing, JobBoardPlatform } from "../types/Platform";
+import type { JobListing, JobBoardPlatform } from "../types/JobBoardPlatform";
 
 enum LeverClassNames {
   POSTINGS_GROUP = 'postings-group',
