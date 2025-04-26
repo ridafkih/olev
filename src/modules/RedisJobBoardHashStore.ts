@@ -1,6 +1,9 @@
 import { createClient, type RedisClientType } from "redis";
 import type { JobBoardHashStore } from "../types/JobBoardHashStore";
 
+/**
+ * TODO: Split this up into a DatabaseManager and a HashStore, use composition.
+ */
 export class RedisJobBoardHashStore implements JobBoardHashStore {
   private started: boolean = false;
 
