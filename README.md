@@ -17,7 +17,7 @@ Olev is a job board monitoring service that checks for changes in Lever-based jo
 
 ## How It Works
 
-1. Vercel Cron Jobs periodically call the `/lever` endpoint with a Lever job board URL
+1. Vercel Cron Jobs periodically call the recruiting software platform endpoint with a job board URL on the `url` query parameter.
 2. Implementations of `JobBoardPlatform` scrapes the job listings from the specified URL
 3. `XXHashGenerator` creates a hash of information extracted from the job listings
 4. `RedisJobBoardHashStore` compares the new hash with the stored hash
