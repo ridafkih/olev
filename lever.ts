@@ -3,7 +3,6 @@ import xxhash from "@ridafkih/xxhash-wasm"
 import { LogSnag } from 'logsnag';
 import { isUrlValid } from "./utils/url";
 import { Lever } from "./platforms/lever";
-import type { JobListing } from "./types/Platform";
 
 const { REDIS_URL, LOGSNAG_PROJECT_NAME, LOGSNAG_API_KEY } = process.env;
 const [, , url] = process.argv;
