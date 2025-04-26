@@ -6,17 +6,21 @@ import { LogSnagJobListingNotificationService } from "../../modules/LogSnagJobLi
 import { EnvironmentVariableManager } from "../../modules/EnvironmentVariableManager";
 import { XXHashGenerator } from "../../modules/XXHashGenerator";
 import { RedisRateLimiter } from "../../modules/RedisRateLimiter";
+import { UrlWhitelist } from "../../modules/UrlWhitelist";
 
 const {
   LOGSNAG_API_KEY,
   LOGSNAG_PROJECT_NAME,
-  REDIS_URL
+  REDIS_URL,
+  WHITELIST_URLS
 } = new EnvironmentVariableManager(process.env, type({
   REDIS_URL: 'string.url',
   LOGSNAG_PROJECT_NAME: 'string',
   LOGSNAG_API_KEY: 'string',
+  WHITELIST_URLS: 'string?'
 })).getAll()
 
+const urlWhitelist = new UrlWhitelist(WHITELIST_URLS);
 const redisHashStore = new RedisJobBoardHashStore(REDIS_URL)
 const rateLimiter = new RedisRateLimiter(REDIS_URL);
 
@@ -31,6 +35,10 @@ export async function GET(request: Request) {
 
   if (!url || !hostname || !pathname) {
     throw Error(`Invalid URL has been passed into the 'url' query parameter.`)
+  }
+
+  if (!urlWhitelist.isAllowed(url)) {
+    return new NextResponse(null, { status: 403 });
   }
 
   if (await rateLimiter.isRateLimited(url)) {
