@@ -4,7 +4,7 @@ import type { JobBoardHashStore } from "../types/JobBoardHashStore";
 export class RedisJobBoardHashStore implements JobBoardHashStore {
   private started: boolean = false;
 
-  private readonly client;
+  private readonly client: RedisClientType;
   
   constructor(private readonly redisUrlString: string) {
     this.client = createClient({ url: this.redisUrlString });
