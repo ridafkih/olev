@@ -14,15 +14,19 @@ Olev is a job board monitoring service that checks for changes in Lever-based jo
 - Scheduled checks using Vercel Cron Jobs
 - Real-time notifications via LogSnag when changes are detected
 - Efficient change detection using XXHash and Redis
+- Rate limiting to prevent excessive API calls (15-minute cooldown per URL)
+- URL whitelist support to restrict which job boards can be monitored
 
 ## How It Works
 
 1. Vercel Cron Jobs periodically call the recruiting software platform endpoint with a job board URL on the `url` query parameter.
-2. Implementation of `JobBoardPlatform` scrapes the job listings from the specified URL
-3. Implementation of `XXHashGenerator` creates a hash of information extracted from the job listings
-4. Implementation of `JobBoardHashStore` compares the new hash with the stored hash
-5. If changes are detected, implementation of `JobListingNotificationService` sends a notification
-6. The hash is updated in Redis for future comparisons
+2. URL is checked against the whitelist, if configured (403 Forbidden if not allowed)
+3. Rate limiting check ensures the URL hasn't been processed in the last 15 minutes (429 Too Many Requests if rate limited)
+4. Implementation of `JobBoardPlatform` scrapes the job listings from the specified URL
+5. Implementation of `XXHashGenerator` creates a hash of information extracted from the job listings
+6. Implementation of `JobBoardHashStore` compares the new hash with the stored hash
+7. If changes are detected, implementation of `JobListingNotificationService` sends a notification
+8. The hash is updated in Redis for future comparisons
 
 ## Environment Variables
 
@@ -32,6 +36,12 @@ The following environment variables are required:
 REDIS_URL=
 LOGSNAG_PROJECT_NAME=
 LOGSNAG_API_KEY=
+```
+
+Optional environment variables:
+
+```
+WHITELIST_URLS=https://jobs.lever.co/company1,https://jobs.lever.co/company2
 ```
 
 If you have one configured, these can be pulled by the connected Vercel project using the following command.
