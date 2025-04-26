@@ -47,7 +47,6 @@ export async function GET(request: Request) {
 
     return new NextResponse(null, { status: 200 });
   } catch (error) {
-    console.error('Support submission failed:', error)
     notificationService.notifyCheckFailed(url)
     return NextResponse.json(null, { status: 500 })
   } finally {
