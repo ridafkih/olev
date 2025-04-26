@@ -23,7 +23,7 @@ export async function GET(request: Request) {
   const url = new URL(request.url).searchParams.get("url")
   const { hostname, pathname } = url !== null ? new URL(url) : {}
 
-  if (!url || !hostname || pathname) {
+  if (!url || !hostname || !pathname) {
     throw Error(`Invalid URL has been passed into the 'url' query parameter.`)
   }
 
