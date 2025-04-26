@@ -3,4 +3,5 @@ export interface JobBoardHashStore {
   setKey(key: string, value: string): Promise<void>;
   start(): Promise<void>;
   stop(): Promise<void>;
+  purge(): Promise<void>;
 }

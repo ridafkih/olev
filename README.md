@@ -46,6 +46,13 @@ vercel env pull .env.development.local
 git clone git@github.com:ridafkih/olev.git
 ```
 
+## Commands
+
+```bash
+# Purges the entire remote Redis key-value store.
+bun purge
+```
+
 ## Deployment
 
 Olev uses Vercel's Cron Jobs feature to schedule regular checks of job boards. The current configuration checks specified job boards every 15 minutes:

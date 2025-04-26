@@ -25,6 +25,11 @@ export class RedisJobBoardHashStore implements JobBoardHashStore {
     return this.client.get(key).then((value) => value === digest);
   }
 
+  public async purge(): Promise<void> {
+    await this.assertStarted("purge");
+    await this.client.flushAll();
+  }
+
   public async start(): Promise<void> {
     await this.client.connect()
     this.started = true;

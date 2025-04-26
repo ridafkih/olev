@@ -2,6 +2,9 @@
   "name": "olev",
   "type": "module",
   "private": true,
+  "scripts": {
+    "purge": "bun scripts/purge.ts"
+  },
   "devDependencies": {
     "@types/bun": "latest",
     "@types/jsdom": "^21.1.7",
