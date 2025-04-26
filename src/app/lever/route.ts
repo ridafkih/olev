@@ -5,6 +5,7 @@ import { RedisJobBoardHashStore } from "../../modules/RedisJobBoardHashStore";
 import { LogSnagJobListingNotificationService } from "../../modules/LogSnagJobListingNotificationService";
 import { EnvironmentVariableManager } from "../../modules/EnvironmentVariableManager";
 import { XXHashGenerator } from "../../modules/XXHashGenerator";
+import { RedisRateLimiter } from "../../modules/RedisRateLimiter";
 
 const {
   LOGSNAG_API_KEY,
@@ -17,7 +18,12 @@ const {
 })).getAll()
 
 const redisHashStore = new RedisJobBoardHashStore(REDIS_URL)
-await redisHashStore.start();
+const rateLimiter = new RedisRateLimiter(REDIS_URL);
+
+await Promise.all([
+  redisHashStore.start(),
+  rateLimiter.start()
+]);
 
 export async function GET(request: Request) {
   const url = new URL(request.url).searchParams.get("url")
@@ -25,6 +31,10 @@ export async function GET(request: Request) {
 
   if (!url || !hostname || !pathname) {
     throw Error(`Invalid URL has been passed into the 'url' query parameter.`)
+  }
+
+  if (await rateLimiter.isRateLimited(url)) {
+    return new NextResponse(null, { status: 429 });
   }
 
   const channel = [hostname, pathname].join("_").replace(/[^a-z0-9_]/g, '_')
@@ -45,11 +55,15 @@ export async function GET(request: Request) {
       ]);
     }
 
+    await rateLimiter.recordAccess(url);
     return new NextResponse(null, { status: 200 });
   } catch (error) {
     notificationService.notifyCheckFailed(url)
     return NextResponse.json(null, { status: 500 })
   } finally {
-    redisHashStore.stop()
+    await Promise.all([
+      redisHashStore.stop(),
+      rateLimiter.stop()
+    ]);
   }
 } 
