@@ -54,7 +54,6 @@ if (storedHash === null || storedHash !== digest) {
     icon: '📋',
     notify: true,
     tags: { url, platform: 'lever' },
-    timestamp: Date.now(),
   })
 
   await store.set(url, digest);
