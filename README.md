@@ -1,32 +1,74 @@
-# olev
+# Olev
 
-## Prerequisites
+Olev is a job board monitoring service that checks for changes in Lever-based job boards and sends notifications when changes to the listings are detected.
 
-In order to compare the hash of the current job postings with that which is stored in the Redis store, you need to instantiate a Redis store, then set the `REDIS_URL` environment variable to the url which points to the Redis store.
+## Supported Platforms
 
-You must also have a LogSnag project configured, and set the `LOGSNAG_PROJECT_NAME` environment variable to the project name, and `LOGSNAG_API_KEY` to an API key attached to the project.
+- [ ] Ashby
+- [x] Lever
+- [ ] Greenhouse
 
-If you're part of the Vercel organization which has the environment variables configured, run the following command.
+## Features
 
-```bash
+- Automated monitoring of job boards
+- Scheduled checks using Vercel Cron Jobs
+- Real-time notifications via LogSnag when changes are detected
+- Efficient change detection using XXHash and Redis
+
+## How It Works
+
+1. Vercel Cron Jobs periodically call the `/lever` endpoint with a Lever job board URL
+2. Implementations of `JobBoardPlatform` scrapes the job listings from the specified URL
+3. `XXHashGenerator` creates a hash of information extracted from the job listings
+4. `RedisJobBoardHashStore` compares the new hash with the stored hash
+5. If changes are detected, `LogSnagJobListingNotificationService` sends a notification
+6. The hash is updated in Redis for future comparisons
+
+## Environment Variables
+
+The following environment variables are required:
+
+```
+REDIS_URL=
+LOGSNAG_PROJECT_NAME=
+LOGSNAG_API_KEY=
+```
+
+If you have one configured, these can be pulled by the connected Vercel project using the following command.
+
+```
 vercel env pull .env.development.local
 ```
 
-## Recruiter Platform Scraping Tool
-
-This is a tool that allows you to scrape data from recruitment platforms.
-
-### Supported Platforms
-
-- [x] Lever
-- [ ] Ashby
+## Getting Started
 
 ```bash
-bun install
+git clone git@github.com:ridafkih/olev.git
 ```
 
-To run:
+## Deployment
 
-```bash
-bun lever https://jobs.lever.co/company-lever-link
+Olev uses Vercel's Cron Jobs feature to schedule regular checks of job boards. The current configuration checks specified job boards every 15 minutes:
+
+```json
+{
+  "crons": [
+    {
+      "path": "/lever?url=https://jobs.lever.co/your-top-pick-here",
+      "schedule": "*/15 * * * *"
+    }
+  ]
+}
 ```
+
+## Adding New Job Boards
+
+To monitor additional Lever job boards, add new cron job configurations to the `vercel.json` file.
+
+## License
+
+Olev is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+## Author
+
+Created by Rida F'kih.
