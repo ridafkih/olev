@@ -24,6 +24,8 @@ const {
 const urlWhitelist = new UrlWhitelist(WHITELIST_URLS);
 const redisClient = new RedisClient(REDIS_URL);
 
+await redisClient.start();
+
 export async function GET(request: Request) {
   const url = new URL(request.url).searchParams.get("url")
   const { hostname, pathname } = url !== null ? new URL(url) : {}
