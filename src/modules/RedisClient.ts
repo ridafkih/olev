@@ -19,7 +19,11 @@ export class RedisClient {
     await this.client.set(key, value);
   }
 
-  public getKey(key: string): Promise<string | null> {
+  public async getKey(key: string): Promise<string | null> {
     return this.client.get(key);
+  }
+
+  public async purge(): Promise<void> {
+    await this.client.flushDb();
   }
 }

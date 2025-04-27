@@ -1,6 +1,6 @@
 import { type } from "arktype";
 import { EnvironmentVariableManager } from "../src/modules/EnvironmentVariableManager";
-import { RedisJobBoardHashStore } from "../src/modules/RedisJobBoardHashStore";
+import { RedisClient } from "../src/modules/RedisClient";
 
 const {
   REDIS_URL
@@ -8,9 +8,9 @@ const {
   REDIS_URL: 'string.url',
 })).getAll()
 
-const redisHashStore = new RedisJobBoardHashStore(REDIS_URL)
-await redisHashStore.start();
-await redisHashStore.purge();
-await redisHashStore.stop();
+const redisClient = new RedisClient(REDIS_URL);
+await redisClient.start();
+await redisClient.purge();
+await redisClient.stop();
 
 console.log("Database has been successfully purged.");
