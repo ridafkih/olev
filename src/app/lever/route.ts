@@ -8,7 +8,7 @@ import { HashNotification } from "../../modules/notifications";
 import { RemoteDocument } from "../../modules/remote-document";
 import { DocumentHasher } from "../../modules/document-hash";
 import { XXHashGenerator } from "../../modules/xxhash";
-import { JobListingIDExtractor } from "../../modules/lever";
+import { JobListingIDExtractor, TextContentExtractor } from "../../modules/lever";
 import { RemoteHashStore } from "../../modules/remote-hash-store";
 
 const {
@@ -63,9 +63,10 @@ export async function GET(request: Request) {
   try {
     const hashGenerator = new XXHashGenerator();    
     const document = await RemoteDocument.fromUrl(jobBoardUrlString);
-    const remoteDocumentHasher = new DocumentHasher(document);
 
-    remoteDocumentHasher.updateHash('[data-qa-posting-id]', new JobListingIDExtractor(), hashGenerator);
+    new DocumentHasher(document)
+      .updateHash('.posting[data-qa-posting-id]', new JobListingIDExtractor(), hashGenerator)
+      .updateHash('.posting h5.posting-name', new TextContentExtractor(), hashGenerator);
 
     const matches = await redisHashStore.checkHash(hashGenerator);
 
@@ -73,7 +74,7 @@ export async function GET(request: Request) {
       await redisHashStore.saveHash(hashGenerator);
       await new HashNotification("Listings Change Detected", false)
         .setChannel(channel)
-        .setDescription(`A change was detected in the listings at '${jobBoardUrlString}', and a new hash '${hashGenerator}' has been generated and saved.`)
+        .setDescription(`A change was detected in the listings at '${jobBoardUrlString}', and a new hash '${hashGenerator.toString()}' has been generated and saved.`)
         .setTags({ url: jobBoardUrlString, platform: jobBoardHostname })
         .send(notificatonService)
     }

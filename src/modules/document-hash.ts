@@ -9,12 +9,14 @@ export class DocumentHasher {
     selector: string,
     extractor: ElementPropertyExtractor,
     hashGenerator: HashGenerator,
-  ) {
+  ): this {
     const elements = this.remoteDocument.getDocument().querySelectorAll(selector);
     const values = Array.from(elements).map(extractor.extract);
 
     for (const value of values) {
       hashGenerator.update(value);
     }
+
+    return this;
   }
 }

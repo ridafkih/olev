@@ -11,3 +11,9 @@ export class JobListingIDExtractor implements ElementPropertyExtractor {
     return candidate;
   }
 }
+
+export class TextContentExtractor implements ElementPropertyExtractor {
+  extract(element: Element): string {
+    return element.textContent || "";
+  }
+}
