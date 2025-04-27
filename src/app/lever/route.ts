@@ -45,7 +45,7 @@ export async function GET(request: Request) {
 
   const channel = LogSnagUtilities.getChannelName(jobBoardHostname, jobBoardPathname);
 
-  if (!whitelist.isAllowed(channel)) {
+  if (!whitelist.isAllowed(jobBoardUrlString)) {
     return new Response(null, { status: 403 });
   }
 
