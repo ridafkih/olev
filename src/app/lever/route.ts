@@ -7,7 +7,7 @@ import { RemoteRateLimitStore } from "../../modules/remote-rate-limiter";
 import { HashNotification } from "../../modules/notifications";
 import { RemoteDocument } from "../../modules/remote-document";
 import { DocumentHasher } from "../../modules/document-hash";
-import { XXHash } from "../../modules/xxhash";
+import { XXHashGenerator } from "../../modules/xxhash";
 import { JobListingIDExtractor } from "../../modules/lever";
 import { RemoteHashStore } from "../../modules/remote-hash-store";
 
@@ -61,19 +61,19 @@ export async function GET(request: Request) {
   );
 
   try {
+    const hashGenerator = new XXHashGenerator();    
     const document = await RemoteDocument.fromUrl(jobBoardUrlString);
-
-    const hash = new XXHash();
     const remoteDocumentHasher = new DocumentHasher(document);
-    const digest = await remoteDocumentHasher.hash('[data-qa-posting-id]', new JobListingIDExtractor(), hash);
 
-    const matches = await redisHashStore.checkHash(digest);
+    remoteDocumentHasher.updateHash('[data-qa-posting-id]', new JobListingIDExtractor(), hashGenerator);
+
+    const matches = await redisHashStore.checkHash(hashGenerator);
 
     if (!matches) {
-      await redisHashStore.saveHash(digest);
+      await redisHashStore.saveHash(hashGenerator);
       await new HashNotification("Listings Change Detected", false)
         .setChannel(channel)
-        .setDescription(`A change was detected in the listings at '${jobBoardUrlString}', and a new hash '${digest}' has been generated and saved.`)
+        .setDescription(`A change was detected in the listings at '${jobBoardUrlString}', and a new hash '${hashGenerator}' has been generated and saved.`)
         .setTags({ url: jobBoardUrlString, platform: jobBoardHostname })
         .send(notificatonService)
     }

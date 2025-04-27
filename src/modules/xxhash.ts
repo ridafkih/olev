@@ -1,8 +1,8 @@
-import { Hash } from "../interfaces/Hash";
-import xxhash, { XXHash as XXHashType } from "@ridafkih/xxhash-wasm";
+import type { HashGenerator } from "../interfaces/HashGenerator";
+import xxhash, { type XXHash } from "@ridafkih/xxhash-wasm";
 
-export class XXHash implements Hash {
-  private readonly hash: XXHashType<number>;
+export class XXHashGenerator implements HashGenerator {
+  private readonly hash: XXHash<number>;
   
   constructor() {
     this.hash = xxhash().create32();
