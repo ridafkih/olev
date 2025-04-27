@@ -1,44 +1,17 @@
-import { createClient, type RedisClientType } from "redis";
 import type { JobBoardHashStore } from "../types/JobBoardHashStore";
+import type { RedisClient } from "./RedisClient";
 
-/**
- * TODO: Split this up into a DatabaseManager and a HashStore, use composition.
- */
 export class RedisJobBoardHashStore implements JobBoardHashStore {
-  private started: boolean = false;
+  constructor(
+    private readonly client: RedisClient,
+    private readonly hash: string,
+  ) {}
 
-  private readonly client: RedisClientType;
-  
-  constructor(private readonly redisUrlString: string) {
-    this.client = createClient({ url: this.redisUrlString });
+  public async saveHash(value: string): Promise<void> {
+    await this.client.setKey(this.hash, value)
   }
 
-  private assertStarted(callerMethodName: string) {
-    if (!this.started)
-      throw Error(`Ensure \`RedisJobBoardHashStore#start\` has resolved before using \`RedisJobBoardHashStore#${callerMethodName}\`.`)
-  }
-
-  public async setKey(key: string, value: string): Promise<void> {
-    this.assertStarted("setKey");
-    await this.client.set(key, value)
-  }
-
-  public checkKey(key: string, digest: string): Promise<boolean> {
-    this.assertStarted("checkKey");
-    return this.client.get(key).then((value) => value === digest);
-  }
-
-  public async purge(): Promise<void> {
-    await this.assertStarted("purge");
-    await this.client.flushAll();
-  }
-
-  public async start(): Promise<void> {
-    await this.client.connect()
-    this.started = true;
-  }
-
-  public stop(): Promise<void> {    
-    return this.client.disconnect()
+  public async checkHash(digest: string): Promise<boolean> {
+    return this.client.getKey(this.hash).then((value) => value === digest);
   }
 }

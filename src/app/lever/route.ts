@@ -7,6 +7,7 @@ import { EnvironmentVariableManager } from "../../modules/EnvironmentVariableMan
 import { XXHashGenerator } from "../../modules/XXHashGenerator";
 import { RedisRateLimiter } from "../../modules/RedisRateLimiter";
 import { UrlWhitelist } from "../../modules/UrlWhitelist";
+import { RedisClient } from "../../modules/RedisClient";
 
 const {
   LOGSNAG_API_KEY,
@@ -21,8 +22,7 @@ const {
 })).getAll()
 
 const urlWhitelist = new UrlWhitelist(WHITELIST_URLS);
-const redisHashStore = new RedisJobBoardHashStore(REDIS_URL)
-const rateLimiter = new RedisRateLimiter(REDIS_URL);
+const redisClient = new RedisClient(REDIS_URL);
 
 export async function GET(request: Request) {
   const url = new URL(request.url).searchParams.get("url")
@@ -32,14 +32,11 @@ export async function GET(request: Request) {
     throw Error(`Invalid URL has been passed into the 'url' query parameter.`)
   }
 
-  await Promise.all([
-    redisHashStore.start(),
-    rateLimiter.start()
-  ]);
-
   if (!urlWhitelist.isAllowed(url)) {
     return new NextResponse(null, { status: 403 });
   }
+
+  const rateLimiter = new RedisRateLimiter(redisClient)
 
   if (await rateLimiter.isRateLimited(url)) {
     return new NextResponse(null, { status: 429 });
@@ -54,11 +51,12 @@ export async function GET(request: Request) {
     const listings = await lever.getListings();
     const hash = new XXHashGenerator(listings, ({ id, title }) => id + title).toString();
 
-    const matches = await redisHashStore.checkKey(url, hash);
+    const redisHashStore = new RedisJobBoardHashStore(redisClient, hash)
+    const matches = await redisHashStore.checkHash(hash);
 
     if (!matches) {
       await Promise.all([
-        redisHashStore.setKey(url, hash),
+        redisHashStore.saveHash(hash),
         notificationService.notifyChangeDetected(url, hash),
       ]);
     }
@@ -68,10 +66,5 @@ export async function GET(request: Request) {
   } catch (error) {
     notificationService.notifyCheckFailed(url)
     return NextResponse.json(null, { status: 500 })
-  } finally {
-    await Promise.all([
-      redisHashStore.stop(),
-      rateLimiter.stop()
-    ]);
   }
 } 
