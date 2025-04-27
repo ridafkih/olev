@@ -1,4 +1,4 @@
-import { KeyValueRemoteStore } from "../.interfaces/KeyValueRemoteStore";
+import { KeyValueRemoteStore } from "../interfaces/KeyValueRemoteStore";
 
 export class RemoteRateLimitStore {
   private readonly cooldownMs: number;

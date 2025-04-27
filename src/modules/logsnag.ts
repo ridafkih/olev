@@ -1,6 +1,6 @@
 import { LogSnag} from "logsnag";
-import type { Notification } from "../.interfaces/Notification";
-import type { NotificationService } from "../.interfaces/NotificationService";
+import type { Notification } from "../interfaces/Notification";
+import type { NotificationService } from "../interfaces/NotificationService";
 
 export class LogSnagNotificationService implements NotificationService {
   private readonly client: LogSnag;
@@ -18,5 +18,11 @@ export class LogSnagNotificationService implements NotificationService {
       tags: notification.getTags(),
       notify: true,
     })
+  }
+}
+
+export class LogSnagUtilities {
+  static getChannelName(...segments: string[]): string {
+    return segments.join("_").replace(/[^a-z0-9_]/g, '_')
   }
 }

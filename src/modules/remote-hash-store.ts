@@ -1,5 +1,5 @@
-import type { Hash } from "../.interfaces/Hash";
-import type { KeyValueRemoteStore } from "../.interfaces/KeyValueRemoteStore";
+import type { Hash } from "../interfaces/Hash";
+import type { KeyValueRemoteStore } from "../interfaces/KeyValueRemoteStore";
 
 export class RemoteHashStore {
   constructor(

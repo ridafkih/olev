@@ -1,13 +1,15 @@
 import { type } from "arktype";
-import { NextResponse } from "next/server"
-import { LeverPlatform } from "../../platforms/LeverPlatform";
-import { RedisJobBoardHashStore } from "../../modules/RedisJobBoardHashStore";
-import { LogSnagJobListingNotificationService } from "../../modules/LogSnagJobListingNotificationService";
-import { EnvironmentVariableManager } from "../../modules/EnvironmentVariableManager";
-import { XXHashGenerator } from "../../modules/XXHashGenerator";
-import { RedisRateLimiter } from "../../modules/RedisRateLimiter";
-import { UrlWhitelist } from "../../modules/UrlWhitelist";
-import { RedisClient } from "../../modules/RedisClient";
+import { EnvironmentVariableManager } from "../../modules/environment";
+import { URLWhitelist } from "../../modules/url-whitelist";
+import { Redis } from "../../modules/redis";
+import { LogSnagNotificationService, LogSnagUtilities } from "../../modules/logsnag";
+import { RemoteRateLimitStore } from "../../modules/remote-rate-limiter";
+import { HashNotification } from "../../modules/notifications";
+import { RemoteDocument } from "../../modules/remote-document";
+import { DocumentHasher } from "../../modules/document-hash";
+import { XXHash } from "../../modules/xxhash";
+import { JobListingIDExtractor } from "../../modules/lever";
+import { RemoteHashStore } from "../../modules/remote-hash-store";
 
 const {
   LOGSNAG_API_KEY,
@@ -21,52 +23,72 @@ const {
   WHITELIST_URLS: 'string?'
 })).getAll()
 
-const urlWhitelist = new UrlWhitelist(WHITELIST_URLS);
-const redisClient = new RedisClient(REDIS_URL);
+const redisClient = new Redis(REDIS_URL)
+await redisClient.start()
 
-await redisClient.start();
+const whitelist = new URLWhitelist(WHITELIST_URLS)
+const rateLimiter = new RemoteRateLimitStore(redisClient, 10);
+const redisHashStore = new RemoteHashStore(redisClient);
 
 export async function GET(request: Request) {
-  const url = new URL(request.url).searchParams.get("url")
-  const { hostname, pathname } = url !== null ? new URL(url) : {}
+  const requestUrl = new URL(request.url);
+  const jobBoardUrlString = requestUrl.searchParams.get("url")
 
-  if (!url || !hostname || !pathname) {
-    throw Error(`Invalid URL has been passed into the 'url' query parameter.`)
+  if (!jobBoardUrlString) {
+    return new Response(null, { status: 400 });
   }
 
-  if (!urlWhitelist.isAllowed(url)) {
-    return new NextResponse(null, { status: 403 });
+  const {
+    hostname: jobBoardHostname,
+    pathname: jobBoardPathname,
+  } = new URL(jobBoardUrlString);
+
+  const channel = LogSnagUtilities.getChannelName(jobBoardHostname, jobBoardPathname);
+
+  if (!whitelist.isAllowed(channel)) {
+    return new Response(null, { status: 403 });
   }
 
-  const rateLimiter = new RedisRateLimiter(redisClient)
+  const isRateLimited = await rateLimiter.isRateLimited(channel);
 
-  if (await rateLimiter.isRateLimited(url)) {
-    return new NextResponse(null, { status: 429 });
+  if (isRateLimited) {
+    return new Response(null, { status: 429 });
   }
 
-  const channel = [hostname, pathname].join("_").replace(/[^a-z0-9_]/g, '_')
-  const notificationService = new LogSnagJobListingNotificationService(LOGSNAG_API_KEY, LOGSNAG_PROJECT_NAME, channel, "lever")
+  const notificatonService = new LogSnagNotificationService(
+    LOGSNAG_PROJECT_NAME,
+    LOGSNAG_API_KEY
+  );
 
   try {
-    const lever = new LeverPlatform(url)
+    const document = await RemoteDocument.fromUrl(jobBoardUrlString);
 
-    const listings = await lever.getListings();
-    const hash = new XXHashGenerator(listings, ({ id, title }) => id + title).toString();
+    const hash = new XXHash();
+    const remoteDocumentHasher = new DocumentHasher(document);
+    const digest = await remoteDocumentHasher.hash('[data-qa-posting-id]', new JobListingIDExtractor(), hash);
 
-    const redisHashStore = new RedisJobBoardHashStore(redisClient, hash)
-    const matches = await redisHashStore.checkHash(hash);
+    const matches = await redisHashStore.checkHash(digest);
 
     if (!matches) {
-      await Promise.all([
-        redisHashStore.saveHash(hash),
-        notificationService.notifyChangeDetected(url, hash),
-      ]);
+      await redisHashStore.saveHash(digest);
+      await new HashNotification("Listings Change Detected", false)
+        .setChannel(channel)
+        .setDescription(`A change was detected in the listings at '${jobBoardUrlString}', and a new hash '${digest}' has been generated and saved.`)
+        .setTags({ url: jobBoardUrlString, platform: jobBoardHostname })
+        .send(notificatonService)
     }
 
-    await rateLimiter.recordAccess(url);
-    return new NextResponse(null, { status: 200 });
+    await rateLimiter.checkpoint(channel);
+    return new Response(null, { status: 200 });
   } catch (error) {
-    notificationService.notifyCheckFailed(url)
-    return NextResponse.json(null, { status: 500 })
+    console.error(error);
+
+    await new HashNotification("Listing Check Failed", true)
+      .setChannel(channel)
+      .setDescription(`Something went wrong with checking the listings when checking '${jobBoardUrlString}'`)
+      .setTags({ platform: jobBoardHostname })
+      .send(notificatonService);
+
+    return new Response(null, { status: 500 });
   }
-} 
+}

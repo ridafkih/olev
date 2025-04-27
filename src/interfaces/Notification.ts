@@ -6,8 +6,8 @@ export interface Notification {
   getTags(): Record<string, string>;
   getChannel(): string;
   getDescription(): string;
-  setChannel(channel: string): void;
-  setDescription(description: string): void;
-  setTags(tags: Record<string, string>): void;
+  setChannel(channel: string): this;
+  setDescription(description: string): this;
+  setTags(tags: Record<string, string>): this;
   send(service: NotificationService): Promise<void>;
 }

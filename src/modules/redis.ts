@@ -1,5 +1,5 @@
 import { createClient, type RedisClientType } from "redis";
-import { KeyValueRemoteStore } from "../.interfaces/KeyValueRemoteStore";
+import { KeyValueRemoteStore } from "../interfaces/KeyValueRemoteStore";
 
 export class Redis implements KeyValueRemoteStore {
   private readonly client: RedisClientType;

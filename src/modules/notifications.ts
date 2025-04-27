@@ -1,12 +1,12 @@
-import type { Notification } from "../.interfaces/Notification";
-import type { NotificationService } from "../.interfaces/NotificationService";
+import type { Notification } from "../interfaces/Notification";
+import type { NotificationService } from "../interfaces/NotificationService";
 
 export class HashNotification implements Notification {
   private readonly icon: string;
 
-  private channel: string;
-  private description: string;
-  private tags: Record<string, string>;
+  private channel?: string;
+  private description?: string;
+  private tags?: Record<string, string>;
   
   constructor(
     private readonly title: string,
@@ -16,10 +16,18 @@ export class HashNotification implements Notification {
   }
 
   getChannel(): string {
+    if (!this.channel) {
+      throw new Error("Channel is not set");
+    }
+
     return this.channel;
   }
 
   getDescription(): string {
+    if (!this.description) {
+      throw new Error("Description is not set");
+    }
+
     return this.description;
   }
 
@@ -28,23 +36,26 @@ export class HashNotification implements Notification {
   }
 
   getTags(): Record<string, string> {
-    return this.tags;
+    return this.tags ?? {};
   }
 
   getTitle(): string {
     return this.title;
   }
 
-  setChannel(channel: string): void {
+  setChannel(channel: string): this {
     this.channel = channel;
+    return this;
   }
 
-  setDescription(description: string): void {
+  setDescription(description: string): this {
     this.description = description;
+    return this;
   }
 
-  setTags(tags: Record<string, string>): void {
+  setTags(tags: Record<string, string>): this {
     this.tags = tags;
+    return this;
   }
 
   async send(service: NotificationService): Promise<void> {

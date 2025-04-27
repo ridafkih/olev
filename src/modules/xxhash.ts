@@ -1,4 +1,4 @@
-import { Hash } from "../.interfaces/Hash";
+import { Hash } from "../interfaces/Hash";
 import xxhash, { XXHash as XXHashType } from "@ridafkih/xxhash-wasm";
 
 export class XXHash implements Hash {
