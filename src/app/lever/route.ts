@@ -27,7 +27,7 @@ const redisClient = new Redis(REDIS_URL)
 await redisClient.start()
 
 const whitelist = new URLWhitelist(WHITELIST_URLS)
-const rateLimiter = new RemoteRateLimitStore(redisClient, 10);
+const rateLimiter = new RemoteRateLimitStore(redisClient, 1);
 const redisHashStore = new RemoteHashStore(redisClient);
 
 export async function GET(request: Request) {

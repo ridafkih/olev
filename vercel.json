@@ -3,11 +3,11 @@
   "crons": [
     {
       "path": "/lever?url=https://jobs.lever.co/wealthsimple",
-      "schedule": "*/15 * * * *"
+      "schedule": "*/3 * * * *"
     },
     {
       "path": "/lever?url=https://jobs.lever.co/stackadapt",
-      "schedule": "*/15 * * * *"
+      "schedule": "*/3 * * * *"
     }
   ]
 }
