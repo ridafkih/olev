@@ -45,18 +45,22 @@ The project is organized as follows:
 
 ## Environment Variables
 
-Required:
-
 ```
-REDIS_URL=
-LOGSNAG_PROJECT_NAME=
+# Twilio
+TWILIO_ACCESS_TOKEN=
+TWILIO_NUMBER_RECIPIENT=
+TWILIO_NUMBER_SENDER=
+TWILIO_SID=
+
+# LogSnag
 LOGSNAG_API_KEY=
-```
+LOGSNAG_PROJECT_NAME=
 
-Optional:
+# Redis
+REDIS_URL=
 
-```
-WHITELIST_URLS=https://jobs.lever.co/company1,https://jobs.lever.co/company2
+# Comma-delimited URL whitelist (optional)
+WHITELIST_URLS=
 ```
 
 ## Local Development
