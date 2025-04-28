@@ -1,5 +1,5 @@
-import type { HashGenerator } from "../interfaces/HashGenerator";
-import type { KeyValueRemoteStore } from "../interfaces/KeyValueRemoteStore";
+import type { HashGenerator } from "../../interfaces/HashGenerator";
+import type { KeyValueRemoteStore } from "../../interfaces/KeyValueRemoteStore";
 
 export class RemoteHashStore {
   constructor(

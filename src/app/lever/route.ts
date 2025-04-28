@@ -4,13 +4,14 @@ import { URLWhitelist } from "../../modules/url-whitelist";
 import { Redis } from "../../modules/redis";
 import { LogSnagNotificationService } from "../../modules/notification-providers/logsnag";
 import { TwilioNotificationService } from "../../modules/notification-providers/twilio";
-import { RemoteRateLimitStore } from "../../modules/remote-rate-limiter";
 import { HashNotification } from "../../modules/notifications";
 import { RemoteDocument } from "../../modules/remote-document";
+import { RemoteHashStore } from "../../modules/stores/remote-hash-store";
+import { RemoteRateLimitStore } from "../../modules/stores/remote-rate-limit-store";
 import { DocumentHasher } from "../../modules/document-hash";
 import { XXHashGenerator } from "../../modules/xxhash";
-import { JobListingIDExtractor, TextContentExtractor } from "../../modules/lever";
-import { RemoteHashStore } from "../../modules/remote-hash-store";
+import { LeverPostingIDExtractor } from "../../modules/extractors/lever-posting-id";
+import { TextContentExtractor } from "../../modules/extractors/text-content";
 
 const {
   LOGSNAG_API_KEY,
@@ -84,7 +85,7 @@ export async function GET(request: Request) {
     
     const hash = new XXHashGenerator();
     new DocumentHasher(document, hash)
-      .updateHash('.posting[data-qa-posting-id]', new JobListingIDExtractor())
+      .updateHash('.posting[data-qa-posting-id]', new LeverPostingIDExtractor())
       .updateHash('.posting h5.posting-name', new TextContentExtractor());
 
     const matches = await redisHashStore.checkHash(hash);
