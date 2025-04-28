@@ -39,6 +39,18 @@ const whitelist = new URLWhitelist(WHITELIST_URLS)
 const rateLimiter = new RemoteRateLimitStore(redisClient, 1);
 const redisHashStore = new RemoteHashStore(redisClient);
 
+const logSnagNotificationService = new LogSnagNotificationService(
+  LOGSNAG_PROJECT_NAME,
+  LOGSNAG_API_KEY
+);
+
+const twilioNotificationService = new TwilioNotificationService(
+  TWILIO_NUMBER_SENDER,
+  TWILIO_NUMBER_RECIPIENT,
+  TWILIO_SID,
+  TWILIO_ACCESS_TOKEN,
+)
+
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url);
   const jobBoardUrlString = requestUrl.searchParams.get("url")
@@ -67,37 +79,27 @@ export async function GET(request: Request) {
     return new Response(null, { status: 429 });
   }
 
-  const logSnagNotificationService = new LogSnagNotificationService(
-    LOGSNAG_PROJECT_NAME,
-    LOGSNAG_API_KEY
-  );
-
-  const twilioNotificationService = new TwilioNotificationService(
-    TWILIO_NUMBER_SENDER,
-    TWILIO_NUMBER_RECIPIENT,
-    TWILIO_SID,
-    TWILIO_ACCESS_TOKEN,
-  )
-
   try {
-    const hashGenerator = new XXHashGenerator();    
     const document = await RemoteDocument.fromUrl(jobBoardUrlString);
-
-    new DocumentHasher(document, hashGenerator)
+    
+    const hash = new XXHashGenerator();
+    new DocumentHasher(document, hash)
       .updateHash('.posting[data-qa-posting-id]', new JobListingIDExtractor())
       .updateHash('.posting h5.posting-name', new TextContentExtractor());
 
-    const matches = await redisHashStore.checkHash(hashGenerator);
+    const matches = await redisHashStore.checkHash(hash);
 
     if (!matches) {
-      await redisHashStore.saveHash(hashGenerator);
+      await redisHashStore.saveHash(hash);
       const notification = new HashNotification("Listings Change Detected", false)
         .setChannel(channel)
-        .setDescription(`A change was detected in the listings at '${jobBoardUrlString}' and a new hash '${hashGenerator.toString()}' has been generated and saved.`)
+        .setDescription(`A change was detected in the listings at '${jobBoardUrlString}' and a new hash '${hash.toString()}' has been generated and saved.`)
         .setTags({ url: jobBoardUrlString, platform: jobBoardHostname });
 
-      await notification.send(logSnagNotificationService);
-      await notification.send(twilioNotificationService);
+      await Promise.all([
+        notification.send(logSnagNotificationService),
+        notification.send(twilioNotificationService),
+      ])
     }
 
     await rateLimiter.checkpoint(channel);
