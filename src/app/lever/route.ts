@@ -83,9 +83,9 @@ export async function GET(request: Request) {
     const hashGenerator = new XXHashGenerator();    
     const document = await RemoteDocument.fromUrl(jobBoardUrlString);
 
-    new DocumentHasher(document)
-      .updateHash('.posting[data-qa-posting-id]', new JobListingIDExtractor(), hashGenerator)
-      .updateHash('.posting h5.posting-name', new TextContentExtractor(), hashGenerator);
+    new DocumentHasher(document, hashGenerator)
+      .updateHash('.posting[data-qa-posting-id]', new JobListingIDExtractor())
+      .updateHash('.posting h5.posting-name', new TextContentExtractor());
 
     const matches = await redisHashStore.checkHash(hashGenerator);
 

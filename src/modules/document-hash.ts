@@ -3,18 +3,20 @@ import type { HashGenerator } from "../interfaces/HashGenerator";
 import { RemoteDocument } from "./remote-document";
 
 export class DocumentHasher {
-  constructor(private readonly remoteDocument: RemoteDocument) {}
+  constructor(
+    private readonly remoteDocument: RemoteDocument,
+    private readonly hashGenerator: HashGenerator,
+  ) {}
   
   updateHash(
     selector: string,
     extractor: ElementPropertyExtractor,
-    hashGenerator: HashGenerator,
   ): this {
     const elements = this.remoteDocument.getDocument().querySelectorAll(selector);
     const values = Array.from(elements).map(extractor.extract);
 
     for (const value of values) {
-      hashGenerator.update(value);
+      this.hashGenerator.update(value);
     }
 
     return this;
