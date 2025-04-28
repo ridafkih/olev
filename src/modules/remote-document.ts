@@ -8,7 +8,7 @@ export class RemoteDocument {
   }
 
   static async fromUrl(url: string): Promise<RemoteDocument> {
-    const { window } = new JSDOM(url);
+    const { window } = await JSDOM.fromURL(url);
     const document = window.document;
 
     return new RemoteDocument(document);

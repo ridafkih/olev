@@ -103,7 +103,7 @@ export async function GET(request: Request) {
     }
 
     await rateLimiter.checkpoint(channel);
-    return new Response(null, { status: 200 });
+    return new Response(hash.toString(), { status: 200 });
   } catch (error) {
     console.error(error);
 

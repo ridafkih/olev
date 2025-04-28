@@ -22,7 +22,7 @@ export class Redis implements KeyValueRemoteStore {
   }
 
   public async purge(): Promise<void> {
-    await this.client.flushDb();
+    await this.client.flushAll();
   }
 
   public async start(): Promise<void> {
