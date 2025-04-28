@@ -9,9 +9,9 @@ export class TwilioNotificationService implements NotificationService {
         private readonly from: string,
         private readonly to: string,
         sid: string,
-        authToken: string,
+        accessToken: string,
     ) {
-        this.client = twilio(sid, authToken);
+        this.client = twilio(sid, accessToken);
     }
     
     public async notify(notification: Notification): Promise<void> {
@@ -20,8 +20,11 @@ export class TwilioNotificationService implements NotificationService {
             from: this.from,
             body: [
                 `${notification.getIcon()} ${notification.getTitle()}`,
+                notification.getChannel(),
                 notification.getDescription(),
-                Object.values(notification.getTags()).map((tag) => `#${tag}`).join(", ")
+                Object.values(notification.getTags()).map((tag) => {
+                    return `#${tag}`;
+                }).join(", ")
             ].join("\n\n")
         })
     }

@@ -20,9 +20,3 @@ export class LogSnagNotificationService implements NotificationService {
     })
   }
 }
-
-export class LogSnagUtilities {
-  static getChannelName(...segments: string[]): string {
-    return segments.join("_").replace(/[^a-z0-9_]/g, '_')
-  }
-}

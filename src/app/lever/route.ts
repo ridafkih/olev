@@ -2,7 +2,8 @@ import { type } from "arktype";
 import { EnvironmentVariableManager } from "../../modules/environment";
 import { URLWhitelist } from "../../modules/url-whitelist";
 import { Redis } from "../../modules/redis";
-import { LogSnagNotificationService, LogSnagUtilities } from "../../modules/logsnag";
+import { LogSnagNotificationService } from "../../modules/notification-providers/logsnag";
+import { TwilioNotificationService } from "../../modules/notification-providers/twilio";
 import { RemoteRateLimitStore } from "../../modules/remote-rate-limiter";
 import { HashNotification } from "../../modules/notifications";
 import { RemoteDocument } from "../../modules/remote-document";
@@ -15,12 +16,20 @@ const {
   LOGSNAG_API_KEY,
   LOGSNAG_PROJECT_NAME,
   REDIS_URL,
-  WHITELIST_URLS
+  WHITELIST_URLS,
+  TWILIO_SID,
+  TWILIO_ACCESS_TOKEN,
+  TWILIO_NUMBER_SENDER,
+  TWILIO_NUMBER_RECIPIENT,
 } = new EnvironmentVariableManager(process.env, type({
   REDIS_URL: 'string.url',
   LOGSNAG_PROJECT_NAME: 'string',
   LOGSNAG_API_KEY: 'string',
-  WHITELIST_URLS: 'string?'
+  WHITELIST_URLS: 'string?',
+  TWILIO_SID: 'string',
+  TWILIO_ACCESS_TOKEN: 'string',
+  TWILIO_NUMBER_SENDER: 'string',
+  TWILIO_NUMBER_RECIPIENT: 'string',
 })).getAll()
 
 const redisClient = new Redis(REDIS_URL)
@@ -43,7 +52,10 @@ export async function GET(request: Request) {
     pathname: jobBoardPathname,
   } = new URL(jobBoardUrlString);
 
-  const channel = LogSnagUtilities.getChannelName(jobBoardHostname, jobBoardPathname);
+  const channel = [
+    jobBoardHostname,
+    jobBoardPathname
+  ].join("_").replace(/[^a-z0-9_]/g, '_');
 
   if (!whitelist.isAllowed(jobBoardUrlString)) {
     return new Response(null, { status: 403 });
@@ -55,10 +67,17 @@ export async function GET(request: Request) {
     return new Response(null, { status: 429 });
   }
 
-  const notificatonService = new LogSnagNotificationService(
+  const logSnagNotificationService = new LogSnagNotificationService(
     LOGSNAG_PROJECT_NAME,
     LOGSNAG_API_KEY
   );
+
+  const twilioNotificationService = new TwilioNotificationService(
+    TWILIO_NUMBER_SENDER,
+    TWILIO_NUMBER_RECIPIENT,
+    TWILIO_SID,
+    TWILIO_ACCESS_TOKEN,
+  )
 
   try {
     const hashGenerator = new XXHashGenerator();    
@@ -72,11 +91,13 @@ export async function GET(request: Request) {
 
     if (!matches) {
       await redisHashStore.saveHash(hashGenerator);
-      await new HashNotification("Listings Change Detected", false)
+      const notification = await new HashNotification("Listings Change Detected", false)
         .setChannel(channel)
         .setDescription(`A change was detected in the listings at '${jobBoardUrlString}', and a new hash '${hashGenerator.toString()}' has been generated and saved.`)
-        .setTags({ url: jobBoardUrlString, platform: jobBoardHostname })
-        .send(notificatonService)
+        .setTags({ url: jobBoardUrlString, platform: jobBoardHostname });
+
+      await notification.send(logSnagNotificationService);
+      await notification.send(twilioNotificationService);
     }
 
     await rateLimiter.checkpoint(channel);
@@ -88,7 +109,7 @@ export async function GET(request: Request) {
       .setChannel(channel)
       .setDescription(`Something went wrong with checking the listings when checking '${jobBoardUrlString}'`)
       .setTags({ platform: jobBoardHostname })
-      .send(notificatonService);
+      .send(logSnagNotificationService);
 
     return new Response(null, { status: 500 });
   }
