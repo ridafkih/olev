@@ -19,7 +19,6 @@ export class TwilioNotificationService implements NotificationService {
             to: this.to,
             from: this.from,
             body: [
-                notification.getChannel(),
                 notification.getDescription(),
                 Object.values(notification.getTags()).map((tag) => {
                     return `#${tag}`;
