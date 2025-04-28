@@ -1,4 +1,4 @@
-import { LeverPostingIDExtractor } from "./extractors/lever-posting-id";
+import { DataAttributeExtractor } from "./extractors/data-attribute";
 import { DocumentHasher } from "./document-hash";
 import { TextContentExtractor } from "./extractors/text-content";
 import { HashNotification } from "./notifications";
@@ -41,7 +41,7 @@ export class LeverJobBoardMonitor {
       new DocumentHasher(document, hash)
         .updateHash(
           ".posting[data-qa-posting-id]",
-          new LeverPostingIDExtractor(),
+          new DataAttributeExtractor("data-qa-posting-id"),
         )
         .updateHash(".posting h5.posting-name", new TextContentExtractor());
 
