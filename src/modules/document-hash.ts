@@ -13,7 +13,9 @@ export class DocumentHasher {
       .getDocument()
       .querySelectorAll(selector);
 
-    const values = Array.from(elements).map(extractor.extract);
+    const values = Array.from(elements).map((element) => {
+      return extractor.extract(element);
+    });
 
     for (const value of values) {
       this.hashGenerator.update(value);
