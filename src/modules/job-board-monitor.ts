@@ -9,7 +9,7 @@ import type { RemoteRateLimitStore } from "./stores/remote-rate-limit-store";
 import type { URLWhitelist } from "./url-whitelist";
 import type { NotificationService } from "../interfaces/NotificationService";
 
-export class JobBoardMonitor {
+export class LeverJobBoardMonitor {
   constructor(
     private readonly whitelist: URLWhitelist,
     private readonly rateLimiter: RemoteRateLimitStore,

@@ -1,10 +1,10 @@
-import { JobBoardMonitor } from "../../modules/job-board-monitor";
+import { LeverJobBoardMonitor } from "../../modules/job-board-monitor";
 import { ServiceFactory } from "../../modules/service-factory";
 
 const { whitelist, rateLimiter, hashStore, notifiers } =
   await ServiceFactory.create();
 
-const monitor = new JobBoardMonitor(
+const monitor = new LeverJobBoardMonitor(
   whitelist,
   rateLimiter,
   hashStore,
