@@ -15,17 +15,13 @@ export class TwilioNotificationService implements NotificationService {
   }
 
   public async notify(notification: Notification): Promise<void> {
+    const tags = Object.values(notification.getTags());
+    const hashtags = tags.map((tag) => `#${tag}`).join(", ");
+
     await this.client.messages.create({
       to: this.to,
       from: this.from,
-      body: [
-        notification.getDescription(),
-        Object.values(notification.getTags())
-          .map((tag) => {
-            return `#${tag}`;
-          })
-          .join(", "),
-      ].join("\n\n"),
+      body: [notification.getDescription(), hashtags].join("\n\n"),
     });
   }
 }

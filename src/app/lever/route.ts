@@ -98,10 +98,10 @@ export async function GET(request: Request) {
         false,
       )
         .setChannel(channel)
+        .setTags({ url: jobBoardUrlString, platform: jobBoardHostname })
         .setDescription(
           `A change was detected in the listings at ${jobBoardUrlString} and the hash '${hash.toString()}' has been generated and saved.`,
-        )
-        .setTags({ url: jobBoardUrlString, platform: jobBoardHostname });
+        );
 
       await Promise.all([
         notification.send(logSnagNotificationService),

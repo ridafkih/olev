@@ -12,6 +12,7 @@ export class DocumentHasher {
     const elements = this.remoteDocument
       .getDocument()
       .querySelectorAll(selector);
+
     const values = Array.from(elements).map(extractor.extract);
 
     for (const value of values) {
