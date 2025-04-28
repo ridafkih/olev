@@ -2,14 +2,14 @@ import type { KeyValueRemoteStore } from "../../interfaces/KeyValueRemoteStore";
 
 export class RemoteRateLimitStore {
   private readonly cooldownMs: number;
-  
+
   constructor(
     private readonly database: KeyValueRemoteStore,
     cooldownMinutes: number,
   ) {
     this.cooldownMs = cooldownMinutes * 60 * 1000;
   }
-  
+
   public async checkpoint(identifier: string): Promise<void> {
     const now = new Date();
     const nextCheckpoint = new Date(now.getTime() + this.cooldownMs);

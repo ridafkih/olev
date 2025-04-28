@@ -7,7 +7,7 @@ export class HashNotification implements Notification {
   private channel?: string;
   private description?: string;
   private tags?: Record<string, string>;
-  
+
   constructor(
     private readonly title: string,
     isError: boolean,

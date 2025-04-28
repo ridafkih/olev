@@ -7,12 +7,11 @@ export class DocumentHasher {
     private readonly remoteDocument: RemoteDocument,
     private readonly hashGenerator: HashGenerator,
   ) {}
-  
-  updateHash(
-    selector: string,
-    extractor: ElementPropertyExtractor,
-  ): this {
-    const elements = this.remoteDocument.getDocument().querySelectorAll(selector);
+
+  updateHash(selector: string, extractor: ElementPropertyExtractor): this {
+    const elements = this.remoteDocument
+      .getDocument()
+      .querySelectorAll(selector);
     const values = Array.from(elements).map(extractor.extract);
 
     for (const value of values) {

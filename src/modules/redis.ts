@@ -3,7 +3,7 @@ import type { KeyValueRemoteStore } from "../interfaces/KeyValueRemoteStore";
 
 export class Redis implements KeyValueRemoteStore {
   private readonly client: RedisClientType;
-  
+
   constructor(private readonly url: string) {
     this.client = createClient({ url });
   }

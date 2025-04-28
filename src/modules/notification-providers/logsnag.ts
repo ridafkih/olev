@@ -8,7 +8,7 @@ export class LogSnagNotificationService implements NotificationService {
   constructor(project: string, token: string) {
     this.client = new LogSnag({ project, token });
   }
-  
+
   async notify(notification: Notification): Promise<void> {
     await this.client.track({
       event: notification.getTitle(),
@@ -17,6 +17,6 @@ export class LogSnagNotificationService implements NotificationService {
       icon: notification.getIcon(),
       tags: notification.getTags(),
       notify: true,
-    })
+    });
   }
 }
