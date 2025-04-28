@@ -1,6 +1,12 @@
 # Olev
 
-Olev is a personal job board monitoring service that uses Vercel Cron to check for changes on selected company job boards and sends notifications directly to your mobile device using [LogSnag](https://logsnag.com/) when changes to the listings are detected.
+Olev is a personal job board monitoring service that uses Vercel Cron to check for changes on selected company job boards and sends notifications with a supported notification provider.
+
+## Supported Notification Providers & Platforms
+- [x] Twilio
+- [x] LogSnag
+- [ ] WhatsApp
+- [ ] iMessage
 
 ## Supported Platforms
 

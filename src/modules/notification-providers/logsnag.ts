@@ -1,6 +1,6 @@
-import { LogSnag} from "logsnag";
-import type { Notification } from "../interfaces/Notification";
-import type { NotificationService } from "../interfaces/NotificationService";
+import { LogSnag } from "logsnag";
+import type { Notification } from "../../interfaces/Notification";
+import type { NotificationService } from "../../interfaces/NotificationService";
 
 export class LogSnagNotificationService implements NotificationService {
   private readonly client: LogSnag;
