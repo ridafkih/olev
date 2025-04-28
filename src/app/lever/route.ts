@@ -93,7 +93,7 @@ export async function GET(request: Request) {
       await redisHashStore.saveHash(hash);
       const notification = new HashNotification("Listings Change Detected", false)
         .setChannel(channel)
-        .setDescription(`A change was detected in the listings at '${jobBoardUrlString}' and a new hash '${hash.toString()}' has been generated and saved.`)
+        .setDescription(`A change was detected in the listings at ${jobBoardUrlString} and the hash '${hash.toString()}' has been generated and saved.`)
         .setTags({ url: jobBoardUrlString, platform: jobBoardHostname });
 
       await Promise.all([
