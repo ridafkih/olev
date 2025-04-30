@@ -60,7 +60,7 @@ export class LeverJobBoardMonitor {
 
         await Promise.all(
           this.notificationServices.map((notificationService) => {
-            notification.send(notificationService);
+            return notification.send(notificationService);
           }),
         );
 
@@ -81,7 +81,7 @@ export class LeverJobBoardMonitor {
 
       await Promise.all(
         this.notificationServices.map((notificationService) => {
-          failNotification.send(notificationService);
+          return failNotification.send(notificationService);
         }),
       );
 
