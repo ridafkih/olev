@@ -48,7 +48,6 @@ export class LeverJobBoardMonitor {
       const isDuplicate = await this.hashStore.checkHash(hash);
 
       if (!isDuplicate) {
-        await this.hashStore.saveHash(hash);
         const notification = new HashNotification(
           "Listings Change Detected",
           false,
@@ -64,6 +63,8 @@ export class LeverJobBoardMonitor {
             notification.send(notificationService);
           }),
         );
+
+        await this.hashStore.saveHash(hash);
       }
 
       await this.rateLimiter.checkpoint(channel);
