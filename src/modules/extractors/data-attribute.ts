@@ -4,7 +4,7 @@ export class DataAttributeExtractor implements ElementPropertyExtractor {
   constructor(private readonly dataAttributeName: string) {}
 
   extract(element: Element): string {
-    const candidate = element.getAttribute(this.dataAttributeName);
+    const candidate = element.getAttribute(`[${this.dataAttributeName}]`);
 
     if (!candidate) {
       throw new Error(

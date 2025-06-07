@@ -9,9 +9,7 @@ export class DocumentHasher {
   ) {}
 
   updateHash(selector: string, extractor: ElementPropertyExtractor): this {
-    const elements = this.remoteDocument
-      .getDocument()
-      .querySelectorAll(selector);
+    const elements = this.remoteDocument.getDocument().querySelectorAll(selector);
 
     const values = Array.from(elements).map((element) => {
       return extractor.extract(element);

@@ -28,10 +28,7 @@ export class ServiceFactory {
     await redis.start();
 
     const notifiers: NotificationService[] = [
-      new LogSnagNotificationService(
-        env.LOGSNAG_PROJECT_NAME,
-        env.LOGSNAG_API_KEY,
-      ),
+      new LogSnagNotificationService(env.LOGSNAG_PROJECT_NAME, env.LOGSNAG_API_KEY),
       new TwilioNotificationService(
         env.TWILIO_NUMBER_SENDER,
         env.TWILIO_NUMBER_RECIPIENT,

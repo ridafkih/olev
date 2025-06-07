@@ -7,10 +7,7 @@ import type { Type } from "arktype";
 export class EnvironmentVariableManager<ArkTypeValidationType extends Type> {
   private validatedProcessEnv: ArkTypeValidationType["infer"];
 
-  constructor(
-    processEnv: NodeJS.ProcessEnv,
-    { assert }: ArkTypeValidationType,
-  ) {
+  constructor(processEnv: NodeJS.ProcessEnv, { assert }: ArkTypeValidationType) {
     this.validatedProcessEnv = assert(processEnv);
   }
 

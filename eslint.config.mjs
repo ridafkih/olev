@@ -41,6 +41,7 @@ export default defineConfig([
         "error",
         {
           endOfLine: "auto",
+          printWidth: 90
         },
       ],
     },

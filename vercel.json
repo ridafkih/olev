@@ -6,8 +6,8 @@
       "schedule": "*/3 * * * *"
     },
     {
-      "path": "/lever?url=https://jobs.lever.co/stackadapt",
-      "schedule": "*/3 * * * *"
+      "path": "/gc.ai?url=https://gc.ai/careers",
+      "schedule": "0 */4 * * *"
     }
   ]
 }

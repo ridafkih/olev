@@ -1,8 +1,4 @@
-import { DataAttributeExtractor } from "./extractors/data-attribute";
-import { DocumentHasher } from "./document-hash";
-import { TextContentExtractor } from "./extractors/text-content";
 import { HashNotification } from "./notifications";
-import { RemoteDocument } from "./remote-document";
 import { XXHashGenerator } from "./xxhash";
 import type { RemoteHashStore } from "./stores/remote-hash-store";
 import type { RemoteRateLimitStore } from "./stores/remote-rate-limit-store";
@@ -22,7 +18,7 @@ export class LeverJobBoardMonitor {
     return [hostname, pathname].join("_").replace(/[^a-z0-9_]/g, "_");
   }
 
-  async check(url: string): Promise<Response> {
+  async check(url: string, hash: XXHashGenerator): Promise<Response> {
     if (!this.whitelist.isAllowed(url)) {
       return new Response(null, { status: 403 });
     }
@@ -35,23 +31,10 @@ export class LeverJobBoardMonitor {
     }
 
     try {
-      const document = await RemoteDocument.fromUrl(url);
-      const hash = new XXHashGenerator();
-
-      new DocumentHasher(document, hash)
-        .updateHash(
-          ".posting[data-qa-posting-id]",
-          new DataAttributeExtractor("data-qa-posting-id"),
-        )
-        .updateHash(".posting h5.posting-name", new TextContentExtractor());
-
       const isDuplicate = await this.hashStore.checkHash(hash);
 
       if (!isDuplicate) {
-        const notification = new HashNotification(
-          "Listings Change Detected",
-          false,
-        )
+        const notification = new HashNotification("Listings Change Detected", false)
           .setChannel(channel)
           .setTags({ url, platform })
           .setDescription(
@@ -71,10 +54,7 @@ export class LeverJobBoardMonitor {
       return new Response(hash.toString(), { status: 200 });
     } catch (error) {
       console.error(error);
-      const failNotification = new HashNotification(
-        "Listing Check Failed",
-        true,
-      )
+      const failNotification = new HashNotification("Listing Check Failed", true)
         .setChannel(channel)
         .setTags({ platform })
         .setDescription(`Something went wrong while checking '${url}'`);
