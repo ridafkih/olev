@@ -2,10 +2,6 @@
   "version": 2,
   "crons": [
     {
-      "path": "/lever?url=https://jobs.lever.co/wealthsimple",
-      "schedule": "*/3 * * * *"
-    },
-    {
       "path": "/gc.ai?url=https://gc.ai/careers",
       "schedule": "0 */4 * * *"
     }
